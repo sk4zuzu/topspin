@@ -1,0 +1,26 @@
+---
+
+- name: "get minikube's status"
+  import_tasks: "{{ playbook_dir }}/import/minikube_status.yml"
+
+- block:
+
+  - name: "start minikube"
+    shell: |
+      minikube start --kubernetes-version={{ kubernetes_version }}
+
+  - name: "install helm tiller"
+    shell: |
+      helm init --upgrade --wait
+
+  - name: "alter default service account"
+    shell: |
+      kubectl create rolebinding default-view \
+        --clusterrole=view \
+        --serviceaccount=default:default \
+        --namespace=default
+
+  when:
+    - not minikube_status
+
+# vim:ts=2:sw=2:et:syn=yaml:

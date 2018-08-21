@@ -1,0 +1,20 @@
+---
+
+- hosts: localhost
+
+  any_errors_fatal: true
+
+  tasks:
+    - import_tasks: "{{ playbook_dir }}/../import/minikube_service.yml"
+      vars: { minikube_service_name: topspin-api }
+
+    - name: "spin"
+      uri:
+        url: "{{ minikube_service_url }}/spin"
+        method: GET
+        return_content: true
+      register: result
+
+    - debug: msg={{ result.content }}
+
+# vim:ts=2:sw=2:et:syn=yaml:

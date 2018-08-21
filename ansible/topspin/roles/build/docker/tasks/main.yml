@@ -1,0 +1,16 @@
+---
+
+- set_fact:
+    docker_dir: |-
+      {{ (playbook_dir ~ "/../../micro/topspin/docker/") | realpath }}
+
+- name: "build and push docker images"
+  shell: |
+    docker-compose {{ item }}
+  args:
+    chdir: "{{ docker_dir }}"
+  with_items:
+    - build
+    - push
+
+# vim:ts=2:sw=2:et:syn=yaml:

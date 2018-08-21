@@ -1,0 +1,15 @@
+---
+
+- hosts: localhost
+
+  any_errors_fatal: true
+
+  roles:
+    - role: build/minikube
+
+    - role: build/docker
+      when: docker_push
+
+    - role: deploy/helm
+
+# vim:ts=2:sw=2:et:syn=yaml:

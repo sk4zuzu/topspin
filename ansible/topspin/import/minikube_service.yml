@@ -1,0 +1,11 @@
+---
+
+- shell: |
+    minikube service --url {{ minikube_service_name }}
+  register: minikube_service_result
+
+- set_fact:
+    minikube_service_url: |-
+      {{ minikube_service_result.stdout_lines | first }}
+
+# vim:ts=2:sw=2:et:syn=yaml:

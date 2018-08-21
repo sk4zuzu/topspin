@@ -1,0 +1,12 @@
+---
+
+- shell: |
+    minikube status
+  register: minikube_status_result
+  failed_when: false
+
+- set_fact:
+    minikube_status: |-
+      {{ minikube_status_result.rc == 0 }}
+
+# vim:ts=2:sw=2:et:syn=yaml:

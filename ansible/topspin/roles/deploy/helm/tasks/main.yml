@@ -1,0 +1,22 @@
+---
+
+- set_fact:
+    helm_package_dir: |-
+      {{ (playbook_dir ~ "/../../helm/topspin/") | realpath }}
+    values_yml_file: |-
+      {{ (playbook_dir ~ "/values.yml") | realpath }}
+
+- name: "update helm package dependencies"
+  shell: |
+    helm repo update && helm dependency build .
+  args:
+    chdir: "{{ helm_package_dir }}/"
+
+- name: "upgrade/install helm package"
+  shell: |
+    helm upgrade --install topspin . -f {{ values_yml_file }} --wait
+  args:
+    chdir: "{{ helm_package_dir }}/"
+
+# vim:ts=2:sw=2:et:syn=yaml:
+
