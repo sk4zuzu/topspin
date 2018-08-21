@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+: ${DOCKER_CE_VERSION:=18.06.0~ce~3-0~ubuntu}
+: ${DOCKER_COMPOSE_VERSION:=1.22.0}
+: ${ANSIBLE_VERSION:=2.6.3}
+: ${MINIKUBE_VERSION:=0.28.2}
+: ${KUBECTL_VERSION:=1.11.2}
+: ${HELM_VERSION:=2.9.1}
+
+if [ -z "$NO_CACHE" ] || [ "$NO_CACHE" = 0 ]; then
+    NO_CACHE=""
+else
+    NO_CACHE="--no-cache"
+fi
+
+set -o errexit -o nounset -o pipefail
+set -x
+
+which readlink xargs dirname docker
+
+SELF=`readlink -f $0 | xargs dirname`
+
+docker build $NO_CACHE -t ops $SELF/ -f- <<EOF
+FROM ubuntu:18.04
+
+RUN apt-get -q update \\
+ && apt-get -q install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common \\
+ && apt-get -q install -y openssh-client net-tools iproute2 git vim \\
+ && apt-get -q install -y python python-pip \\
+ && apt-get -q clean
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \\
+ && add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu \$(lsb_release -cs) stable" \\
+ && apt-get -q update \\
+ && apt-get -q install -y docker-ce=${DOCKER_CE_VERSION} \\
+ && apt-get -q clean
+
+RUN BUILD_DEPS="gcc make pkg-config libffi-dev libssl-dev zlib1g-dev python-dev" \\
+ && apt-get -q install -y \$BUILD_DEPS \\
+ && pip --no-cache-dir install docker-compose==${DOCKER_COMPOSE_VERSION} ansible==${ANSIBLE_VERSION} \\
+ && apt-get -q remove -y \$BUILD_DEPS \\
+ && apt-get -q clean
+
+RUN curl -fsSL https://www.virtualbox.org/download/oracle_vbox_2016.asc | apt-key add - \\
+ && add-apt-repository -y "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian \$(lsb_release -cs) contrib" \\
+ && apt-get -q update \\
+ && apt-get -q install -y --no-install-recommends virtualbox-5.2 kmod \\
+ && apt-get -q clean
+
+RUN curl -fsSL https://storage.googleapis.com/minikube/releases/v${MINIKUBE_VERSION}/minikube-linux-amd64 \\
+         -o /usr/local/bin/minikube \\
+ && chmod +x /usr/local/bin/minikube
+
+RUN curl -fsSL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl \\
+         -o /usr/local/bin/kubectl \\
+ && chmod +x /usr/local/bin/kubectl
+
+RUN curl -fsSL https://storage.googleapis.com/kubernetes-helm/helm-v${HELM_VERSION}-linux-amd64.tar.gz \\
+  | tar -xz -f- linux-amd64/helm \\
+ && mv linux-amd64/helm /usr/local/bin \\
+ && chmod +x /usr/local/bin/helm
+
+WORKDIR /ansible/
+
+ENTRYPOINT []
+CMD /bin/bash
+EOF
+
+exec docker run --rm \
+    --network="host" \
+    --privileged="true" \
+    -v /var/run/docker.sock:/var/run/docker.sock:Z \
+    -v $SELF/../ansible/:/ansible/:Z \
+    -v $SELF/../micro/:/micro/:Z \
+    -v $SELF/../helm/:/helm/:Z \
+    "$@" -it ops
+
+# vim:ts=4:sw=4:et:syn=sh:
