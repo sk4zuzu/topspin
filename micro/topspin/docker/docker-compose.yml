@@ -1,0 +1,55 @@
+version: "2.2"
+
+services:
+
+  nats:
+    image: nats:1.2.0-linux
+
+  srv1:
+    scale: 3
+    image: "${IMAGE_REPOSITORY}${COMPOSE_PROJECT_NAME}"
+    build: &build
+      context: ../
+      dockerfile: docker/topspin.Dockerfile
+    environment: &environment
+      MICRO_REGISTRY: nats
+      MICRO_REGISTRY_ADDRESS: nats:4222
+      MICRO_TRANSPORT: nats
+      MICRO_TRANSPORT_ADDRESS: nats:4222
+      RUN: "srv1"
+    depends_on:
+      - nats
+
+  srv2:
+    scale: 3
+    image: "${IMAGE_REPOSITORY}${COMPOSE_PROJECT_NAME}"
+    build: *build
+    environment:
+        <<: *environment
+        RUN: "srv2"
+    depends_on:
+      - nats
+      - srv1
+
+  api:
+    image: "${IMAGE_REPOSITORY}${COMPOSE_PROJECT_NAME}"
+    build: *build
+    environment:
+      <<: *environment
+      RUN: "api"
+      GIN_MODE: release
+    networks:
+      default:
+        ipv4_address: 172.16.80.69
+    depends_on:
+      - nats
+      - srv1
+      - srv2
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.80.0/24

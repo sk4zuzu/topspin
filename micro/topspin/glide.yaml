@@ -1,0 +1,20 @@
+package: github.com/sk4zuzu/topspin/micro/topspin
+import:
+- package: github.com/sirupsen/logrus
+- package: github.com/micro/go-micro
+  subpackages:
+  - client
+  - server
+- package: github.com/micro/protobuf
+  subpackages:
+  - proto
+  - protoc-gen-go
+- package: github.com/micro/go-web
+- package: github.com/gin-gonic/gin
+- package: k8s.io/client-go
+  subpackages:
+  - kubernetes
+  - rest
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/apis/meta/v1

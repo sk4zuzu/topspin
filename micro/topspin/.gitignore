@@ -1,0 +1,9 @@
+*.swp
+.vscode/
+
+vendor/
+
+proto/*/*.go
+
+cmd/topspin/debug
+cmd/topspin/topspin
