@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "topspin.fullname" . }}-api
+  labels:
+    app: &app {{ template "topspin.name" . }}-api
+    release: &release {{ .Release.Name }}
+    chart: {{ template "topspin.chart" . }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: *app
+    release: *release
+# vim:ts=2:sw=2:et:syn=yaml:

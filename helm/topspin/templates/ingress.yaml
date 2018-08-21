@@ -1,0 +1,40 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "topspin.fullname" . -}}
+{{- $servicePort := .Values.service.port -}}
+{{- $ingressPath := .Values.ingress.path -}}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-api
+  labels:
+    app: &app {{ template "topspin.name" . }}-api
+    release: &release {{ .Release.Name }}
+    chart: {{ template "topspin.chart" . }}
+    heritage: {{ .Release.Service }}
+{{- with .Values.ingress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.ingress.tls }}
+  tls:
+  {{- range .Values.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: {{ $ingressPath }}
+            backend:
+              serviceName: {{ $fullName }}-api
+              servicePort: http
+  {{- end }}
+{{- end }}
+# vim:ts=2:sw=2:et:syn=yaml:

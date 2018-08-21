@@ -1,0 +1,33 @@
+{{- range $micro, $config := .Values.micro }}
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "topspin.fullname" $ }}-{{ $micro }}
+  labels:
+    app: &app {{ template "topspin.name" $ }}-{{ $micro }}
+    release: &release {{ $.Release.Name }}
+    chart: {{ template "topspin.chart" $ }}
+    heritage: {{ $.Release.Service }}
+spec:
+  replicas: {{ $config.replicaCount }}
+  selector:
+    matchLabels:
+      app: *app
+      release: *release
+  template:
+    metadata:
+      labels:
+        app: *app
+        release: *release
+    spec:
+      containers:
+        - name: {{ $.Chart.Name }}-{{ $micro }}
+          image: {{ $config.image.repository }}:{{ $config.image.tag }}
+          imagePullPolicy: {{ $config.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "topspin.fullname" $ }}-{{ $micro }}
+      restartPolicy: Always
+{{- end }}
+# vim:ts=2:sw=2:et:syn=yaml:

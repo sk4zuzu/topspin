@@ -1,0 +1,51 @@
+
+nats:
+  auth:
+    enabled: false
+  debug:
+    enabled: true
+  replicaCount: 3
+
+micro:
+  srv1:
+    image:
+      repository: sk4zuzu/topspin
+      tag: latest
+      pullPolicy: Always
+    replicaCount: 3
+  srv2:
+    image:
+      repository: sk4zuzu/topspin
+      tag: latest
+      pullPolicy: Always
+    replicaCount: 3
+  api:
+    environment:
+      GIN_MODE: release
+    image:
+      repository: sk4zuzu/topspin
+      tag: latest
+      pullPolicy: Always
+    replicaCount: 3
+
+service:
+  type: NodePort
+  port: 80
+
+ingress:
+  enabled: false
+
+#ingress:
+#  enabled: true
+#  annotations:
+#    kubernetes.io/ingress.class: addon-http-application-routing
+#    # kubernetes.io/tls-acme: "true"
+#  path: /
+#  hosts:
+#    - api.k8s.sk4zuzu.eu
+#  tls: []
+#  #  - secretName: chart-example-tls
+#  #    hosts:
+#  #      - api.k8s.sk4zuzu.eu
+
+# vim:ts=2:sw=2:et:syn=yaml:

@@ -1,0 +1,22 @@
+{{- range $micro, $config := .Values.micro }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "topspin.fullname" $ }}-{{ $micro }}
+  labels:
+    app: {{ template "topspin.name" $ }}-{{ $micro }}
+    chart: {{ $.Chart.Name }}-{{ $.Chart.Version }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+data:
+  MICRO_REGISTRY: nats
+  MICRO_REGISTRY_ADDRESS: {{ $.Release.Name }}-nats-client:4222
+  MICRO_TRANSPORT: nats
+  MICRO_TRANSPORT_ADDRESS: {{ $.Release.Name }}-nats-client:4222
+  RUN: {{ $micro }}
+{{- if $config.environment }}
+{{ toYaml $config.environment | indent 2 }}
+{{- end }}
+{{- end }}
+# vim:ts=2:sw=2:et:syn=yaml:

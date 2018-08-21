@@ -1,0 +1,6 @@
+dependencies:
+- name: nats
+  repository: https://kubernetes-charts.storage.googleapis.com
+  version: 0.0.6
+digest: sha256:6c911c289a800e1fd67f8273161342783b65fe67a8b62626a0146291b8a304a4
+generated: 2018-08-21T16:40:04.472822167Z
