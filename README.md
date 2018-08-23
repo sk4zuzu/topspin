@@ -17,7 +17,7 @@ In short, `vbox/ops` is a docker image that contains all required software packa
 : ${ANSIBLE_VERSION:=2.6.3}
 : ${MINIKUBE_VERSION:=0.28.2}
 : ${KUBECTL_VERSION:=1.11.2}
-: ${HELM_VERSION:=2.9.1}
+: ${HELM_VERSION:=2.10.0}
 ```
 
 It is just an abstraction layer over host operating system, it is not required by any means, but it tends to be making life easier.
