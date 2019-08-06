@@ -31,21 +31,14 @@ micro:
 service:
   type: NodePort
   nodePort: 32767
+  port: 8080
 
 ingress:
   enabled: false
-
-#ingress:
-#  enabled: true
-#  annotations:
-#    kubernetes.io/ingress.class: addon-http-application-routing
-#    # kubernetes.io/tls-acme: "true"
-#  path: /
-#  hosts:
-#    - api.k8s.sk4zuzu.eu
-#  tls: []
-#  #  - secretName: chart-example-tls
-#  #    hosts:
-#  #      - api.k8s.sk4zuzu.eu
+  annotations:
+    ingress.gcp.kubernetes.io/pre-shared-cert: sk4zuzu-eu
+  path:
+  hosts:
+    - lel.sk4zuzu.eu
 
 # vim:ts=2:sw=2:et:syn=yaml:

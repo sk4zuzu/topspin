@@ -34,7 +34,7 @@ spec:
           - path: {{ $ingressPath }}
             backend:
               serviceName: {{ $fullName }}-api
-              servicePort: http
+              servicePort: {{ $servicePort }}
   {{- end }}
 {{- end }}
 # vim:ts=2:sw=2:et:syn=yaml:

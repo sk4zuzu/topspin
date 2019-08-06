@@ -25,9 +25,12 @@ spec:
         - name: {{ $.Chart.Name }}-{{ $micro }}
           image: {{ $config.image.repository }}:{{ $config.image.tag }}
           imagePullPolicy: {{ $config.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: {{ template "topspin.fullname" $ }}-{{ $micro }}
       restartPolicy: Always
 {{- end }}
+
 # vim:ts=2:sw=2:et:syn=yaml:
