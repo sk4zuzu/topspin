@@ -25,6 +25,15 @@ var (
 	cl topspin.TopSpinClient
 )
 
+func (ts *TopSpin) Health(c *gin.Context) {
+	log.WithFields(log.Fields{
+		"srv":     serviceName,
+		"handler": "TopSpin.Health",
+	}).Info()
+
+	c.String(200, "")
+}
+
 func (ts *TopSpin) Ping(c *gin.Context) {
 	log.WithFields(log.Fields{
 		"srv":     serviceName,
@@ -78,6 +87,7 @@ func NewAPIRouter() *gin.Engine {
 	router.GET("/ping", ts.Ping)
 	router.GET("/spin", ts.Spin)
 	router.GET("/pods", ts.Pods)
+	router.GET("/", ts.Health)
 	return router
 }
 
